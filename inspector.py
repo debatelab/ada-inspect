@@ -21,7 +21,7 @@ class Inspector:
         max_t = run_config.max_t
         n_agents = run_config.n_agents
         
-        df_results_run = pd.read_csv(os.path.join('data', run_id+'.csv'),index_col=['step','agent'], skipinitialspace=True)
+        df_results_run = pd.read_csv(os.path.join('data',ensemble_id, run_id+'.csv'),index_col=['step','agent'], skipinitialspace=True)
         df_results_run['run_id']=run_id
         df_results_run['ensemble_id']=ensemble_id
         df_results_run = df_results_run.reset_index()

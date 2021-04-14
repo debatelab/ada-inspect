@@ -3,9 +3,15 @@ import streamlit.components.v1 as components
 import pandas as pd
 from inspector import Inspector
 
+# config
+result_path = "data/20210409-01"
+df_config = pd.read_csv("data/20210409-01_config.csv")
+df_filtered = df_config
+
+
 st.title('Artificial Deliberating Agents Inspector')
 
-st.markdown('Inspect the simulation runs underpinning the paper *Natural-language Simulations of Argumentative Opinion Dynamics* ([Betz 2021](https://arxiv.org)).')
+st.markdown('Inspect the simulation runs underpinning the paper *Natural-Language Multi-Agent Simulations of Argumentative Opinion Dynamics* ([Betz 2021](https://arxiv.org)).')
 
 # Sidebar
 
@@ -13,15 +19,38 @@ st.sidebar.subheader('Simulation run')
 
 filter_update = st.sidebar.selectbox(
     'Filter for update mechanism:',
-     ["all","1","2","3"])
+     ["any","random/all","random/bounded confidence","confirmation bias/all","homophily/all"])
+
+if filter_update!="any":
+    # filter by peer selection method
+    if filter_update=="random/bounded confidence":
+        df_filtered = df_filtered[df_filtered.peer_selection_method.eq('bounded_confidence')]
+    else:
+        df_filtered = df_filtered[df_filtered.peer_selection_method.eq('all_neighbors')]
+    # filter by perspective updating
+    if filter_update=='confirmation bias/all':
+        df_filtered = df_filtered[df_filtered.perspective_expansion_method.eq('confirmation_bias_lazy')]
+    elif filter_update=='homophily/all':
+        df_filtered = df_filtered[df_filtered.perspective_expansion_method.eq('homophily')]
+    else:
+        df_filtered = df_filtered[df_filtered.perspective_expansion_method.eq('random')]
 
 filter_agent_type = st.sidebar.selectbox(
     'Filter for agent type:',
-     ["all","l","gc","generating (narrow)"])
+     ["any","listening","generating (creative)","generating (narrow)"])
+
+# filter by peer selection method
+if filter_agent_type!="any":
+    if filter_agent_type=="listening":
+        df_filtered = df_filtered[df_filtered.agent_type.eq('listening')]
+    elif filter_agent_type=="generating (creative)":
+        df_filtered = df_filtered[df_filtered.agent_type.eq('generating') & df_filtered['temp/top_p'].eq('[1.4, 0.95]')]
+    elif filter_agent_type=="generating (narrow)":
+        df_filtered = df_filtered[df_filtered.agent_type.eq('generating') & df_filtered['temp/top_p'].eq('[1.0, 0.5]')]
 
 run_id = st.sidebar.selectbox(
     'Simulation run to inspect:',
-     ['20210409-01_60-5','20210409-01_60-5'])
+     df_filtered.run_id.to_list())
 
 st.sidebar.subheader('Perspective of agent')
 
@@ -37,18 +66,12 @@ if show_clusters:
     step_clustering = st.sidebar.slider('Evaluate clustering at time step:' , min_value=5 , max_value=149 , value=149 , step=1, key='cluster_step')
 
 
+
 # Load data
 
-df_config = pd.Series(
-    {
-        'run_id':'20210409-01_60-5',
-        'ensemble_id':'20210409-01',
-        'n_initial_posts':5,
-        'n_agents':20,
-        'max_t':150
-    }
-)
-df_results = Inspector.results_for_run(df_config)
+
+configrun = df_filtered.loc[df_filtered['run_id'] == run_id].iloc[0]
+df_results = Inspector.results_for_run(configrun)
 
 
 # Perspective Table
@@ -81,7 +104,7 @@ else:
 st.subheader('Opinion trajectories of all agents')
 
 fig = Inspector.detailed_plots(
-    config=df_config,
+    config=configrun,
     data=df_results,
     highlight_agents=[agent_focus],
     highlight_range=[step_focus-1,step_focus+1],
@@ -106,7 +129,7 @@ components.html(html_perspective, height=600, scrolling=True)
 
 st.subheader('Parameters')
 
-
+configrun
 
 
 
