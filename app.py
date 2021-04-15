@@ -11,7 +11,7 @@ df_filtered = df_config
 
 st.title('Artificial Deliberating Agents Inspector')
 
-st.markdown('Inspect the simulation runs underpinning the paper *Natural-Language Multi-Agent Simulations of Argumentative Opinion Dynamics* ([Betz 2021](https://arxiv.org)).')
+st.markdown('Inspect the simulation runs underpinning the paper *Natural-Language Multi-Agent Simulations of Argumentative Opinion Dynamics* ([Betz 2021](http://arxiv.org/abs/2104.06737)).')
 
 # Sidebar
 

@@ -1,3 +1,3 @@
 # ada-inspect
 
-This repo makes available the simulated conversations with artificial deliberative agents presented in Betz (2021) and provides an app to inspect them.
+This repo makes available the simulated conversations with artificial deliberative agents presented in [Betz (2021)](http://arxiv.org/abs/2104.06737) and provides an app to inspect them.
